@@ -3,10 +3,9 @@
     Dim dBaseConnection As New System.Data.OleDb.OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0; Data Source=new_BD.mdb")
     Dim DT As New Data.DataTable
     Dim DA As OleDb.OleDbDataAdapter
-    Dim yearOfBornBaby As String
 
     Private Function Quote(strVariable As String) As String
-        Quote = " ' " & strVariable & " ' "
+        Quote = "'" & strVariable & "'"
     End Function
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -22,13 +21,15 @@
             Me.ComboBox1.Items.Add(r(0).ToString)
         Next
         dBaseConnection.Close()
-        DT.Clear()
+        
     End Sub
 
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
-        Dim FIO As New ArrayList()
+        Dim age As Object
+        age = ComboBox1.SelectedItem
+        Label1.Text = age
         DT.Clear()
-        dBaseCommand = New OleDb.OleDbCommand("SELECT [Фамилия] AND [Имя] FROM [Общие данные] WHERE [Год рождения] = " & Quote(ComboBox1.SelectedItem), dBaseConnection)
+        dBaseCommand = New OleDb.OleDbCommand("SELECT ([Фамилия] + ' ' + [Имя]) AS FI FROM [Общие данные] WHERE [Год рождения] = " & Quote(age.ToString()), dBaseConnection)
         dBaseConnection.Open()
         dBaseCommand.ExecuteNonQuery()
         DA = New OleDb.OleDbDataAdapter(dBaseCommand)
@@ -37,10 +38,9 @@
         Me.ListBox1.Items.Clear()
 
         For Each r As DataRow In DT.Rows
-            FIO.Add(r(0).ToString)
+            Me.ListBox1.Items.Add(r(0).ToString())
         Next
 
-        ListBox1.Items.Add(FIO)
         dBaseConnection.Close()
     End Sub
 End Class
